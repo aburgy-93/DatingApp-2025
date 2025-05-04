@@ -11,10 +11,11 @@ import { AccountService } from '../../_services/accounts.service';
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { FormsModule, NgForm } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
+import { PhotoEditorComponent } from '../photo-editor/photo-editor.component';
 
 @Component({
   selector: 'app-member-edit',
-  imports: [TabsModule, FormsModule],
+  imports: [TabsModule, FormsModule, PhotoEditorComponent],
   standalone: true,
   templateUrl: './member-edit.component.html',
   styleUrl: './member-edit.component.css',
@@ -26,10 +27,10 @@ export class MemberEditComponent implements OnInit {
       $event.returnValue = true;
     }
   }
+  member?: Member;
   private accountService = inject(AccountService);
   private memberService = inject(MembersService);
   private toastr = inject(ToastrService);
-  member?: Member;
 
   ngOnInit(): void {
     this.loadMember();
@@ -51,5 +52,9 @@ export class MemberEditComponent implements OnInit {
         this.editForm?.reset(this.member);
       },
     });
+  }
+
+  onMemberChange(event: Member) {
+    this.member = event;
   }
 }
