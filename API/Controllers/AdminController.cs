@@ -8,12 +8,17 @@ using Microsoft.VisualBasic;
 
 namespace API.Controllers;
 
+// UserManager from ASPNetCore Identity
 public class AdminController(UserManager<AppUser> userManager) : BaseApiController
 {
+    // Only for users with the RequireAdminRole policy
     [Authorize(Policy = "RequireAdminRole")]
     [HttpGet("users-with-roles")]
     public async Task<ActionResult> GetUsersWithRoles()
     {
+        // Retun a list of users in order by username with their username, id, and role.
+        // List the role or roles they have for each user
+        // Some users can have many roles
         var users = await userManager.Users
             .OrderBy(x => x.UserName)
             .Select(x => new {
@@ -25,6 +30,7 @@ public class AdminController(UserManager<AppUser> userManager) : BaseApiControll
         return Ok(users);
     }
 
+    // Only for users with the RequireAdminRole policy
     [Authorize(Policy = "RequireAdminRole")]
     [HttpPost("edit-roles/{username}")]
     public async Task<ActionResult> EditRoles(string username, string roles)
@@ -60,6 +66,7 @@ public class AdminController(UserManager<AppUser> userManager) : BaseApiControll
         return Ok(await userManager.GetRolesAsync(user));
     }
 
+    // Only for users with the ModeratePhotoRole policy
     [Authorize(Policy = "ModeratePhotoRole")]
     [HttpGet("photos-to-moderate")]
     public ActionResult GetPhotosForModeration()

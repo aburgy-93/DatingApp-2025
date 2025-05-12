@@ -14,26 +14,23 @@ public class AccountController(UserManager<AppUser> userManager, ITokenService t
     [HttpPost("register")] // account/register
     public async Task<ActionResult<UserDto>> Register(RegisterDto registerDto)
     {
+        // Checking if the entered username is already taken
         if (await UserExists(registerDto.Username)) return BadRequest("Username is taken");
 
-        // using var hmac = new HMACSHA512();
 
+        // Creating the new user by mapping the registerDto data into an AppUser
         var user = mapper.Map<AppUser>(registerDto);
 
+        // Setting the username to all lower case
         user.UserName = registerDto.Username.ToLower();
-        // user.PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(registerDto.Password));
-        // user.PasswordSalt = hmac.Key;
 
-        // Add user to the context/DB
-        // context.Users.Add(user);
-
+        // Create the user with the password from the registerDto
         var result = await userManager.CreateAsync(user, registerDto.Password);
 
+        // Check to see if result succeeded, else return a bad request with the error(s)
         if (!result.Succeeded) return BadRequest(result.Errors);
 
-        // Await the saved changes
-        // await context.SaveChangesAsync();
-
+        // Retrun the UserDto with the entered data for the new user
         return new UserDto
         {
             Username = user.UserName,
@@ -52,25 +49,16 @@ public class AccountController(UserManager<AppUser> userManager, ITokenService t
                 .FirstOrDefaultAsync(x => 
                     x.NormalizedUserName == loginDto.Username.ToUpper());
 
+        // If user or user.UserName is null, return unauthorized
         if (user == null || user.UserName == null) return Unauthorized("Invalid username");
 
-        // Checking the password
+        // Checking the password, passing in the user and the password from the DTO
         var result = await userManager.CheckPasswordAsync(user, loginDto.Password);
 
+        // If not result, return unauthorized
         if (!result) return Unauthorized();
 
-        // // Use the key (PasswordSalt)
-        // using var hmac = new HMACSHA512(user.PasswordSalt);
-
-        // // Compute the hash
-        // var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(loginDto.Password));
-
-        // // Compare the computed hash with the hash in the DB
-        // for (int i = 0; i < computedHash.Length; i++)
-        // {
-        //     if (computedHash[i] != user.PasswordHash[i]) return Unauthorized("Invalid password");
-        // }
-
+        // If successful, reutrn the UserDto with current user data
         return new UserDto
         {
             Username = user.UserName,

@@ -19,6 +19,7 @@ export class MembersService {
   paginatedResult = signal<PaginatedResult<Member[]> | null>(null);
   memberCache = new Map();
   user = this.accountService.currentUser();
+  // Get the params from the query string from UsersController
   userParams = signal<UserParams>(new UserParams(this.user));
 
   resetUserParams() {

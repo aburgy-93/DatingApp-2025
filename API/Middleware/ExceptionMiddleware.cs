@@ -8,12 +8,15 @@ namespace API.Middleware;
 public class ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger, 
     IHostEnvironment env)
 {
+    // This method is called for every HTTP method that hits the middleware
+    // HttpContext represents all HTTP-specific information about the request/response
     public async Task InvokeAsync(HttpContext context)
     {   
         try
         {
             await next(context);
         }
+        // Setting up the response if an exception occurs
         catch (Exception ex)
         {
             

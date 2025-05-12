@@ -4,6 +4,7 @@ namespace API.Extensions;
 
 public static class DateTimeExtensions
 {
+    // Calculates the dob of a user
     public static int CalculateAte(this DateOnly dob) {
         var today = DateOnly.FromDateTime(DateTime.Now);
 
